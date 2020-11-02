@@ -3,7 +3,7 @@ import Playground exposing (..)
 
 main =
   game view update
-    { x = 0
+    { x = 1
     , y = 0
     , angle = 0
     }
