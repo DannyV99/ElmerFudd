@@ -11,7 +11,7 @@ main =
 view computer truck =
 
   [ rectangle blue computer.screen.width computer.screen.height
-  , image 300 300 "images/GarbageTruck.gif"
+  , image 300 300 "images/emptyGarbage.jpg"
       |> move truck.x truck.y
       |> rotate truck.angle
 
