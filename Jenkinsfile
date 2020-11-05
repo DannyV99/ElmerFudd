@@ -27,7 +27,7 @@ pipeline {
                         transfers: [
                            sshTransfer(
                               sourceFiles: '*',
-                              remoteDirectory: '/tmp',
+                              remoteDirectory: '/home',
                            )
                         ]
                      )
