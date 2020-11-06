@@ -15,17 +15,24 @@ view computer truck =
       |> move truck.x truck.y
       |> rotate truck.angle
 
-  , image 90 90 (changer truck 300)
+  , image 90 90 (changer truck 300 20)
         |> moveRight 300
         |> moveDown 20
   ]
 
 
-changer truck x =
-  if truck.x > x then
-    "images/emptyGarbage" ++ ".jpg"
-  else
-    "images/fullGarbage" ++ ".jpg"
+changer truck x y =
+  let
+    finger =
+      [ (truck.x - 150) < x, x < (truck.x + 150), (truck.y - 150) < y, y < (truck.y + 150) ]
+        |> List.all identity
+
+  in
+
+    if finger then
+      "images/emptyGarbage" ++ ".jpg"
+      else
+        "images/fullGarbage" ++ ".jpg"
 
 
 update computer truck =
