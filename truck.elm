@@ -13,7 +13,7 @@ main =
 
 
 type alias Model =
-    { x : Number, y : Number, angle : Number, garbageCan : GarbageCan, garbageCan2 : GarbageCan2 }
+    { x : Number, y : Number, angle : Number, garbageCan : GarbageCan, garbageCan2 : GarbageCan2, level : Int}
 
 type GarbageCanStatus
     = FullOfGarbage
@@ -26,6 +26,7 @@ type alias GarbageCan
 type alias GarbageCan2
   = { x : Number, y : Number, status: GarbageCanStatus }
 
+
   -- Model --
 
 initModel : Model
@@ -35,6 +36,7 @@ initModel =
     , angle = 0
     , garbageCan = position1
     , garbageCan2 = position2
+    , level = 1
     }
 
 
@@ -47,32 +49,52 @@ position2 =
   { x = 300, y = -300, status = FullOfGarbage }
 
 
+
 -- View --
 
 
 view : Computer -> Model -> List Shape
 view computer model =
+  if model.level == 1 then
     [ rectangle blue computer.screen.width computer.screen.height
-    , image 1400 1400 "images/Road.png"
+    --image 10 10 "images/Road.png"
+        --|> moveRight 1
+        --|> moveDown 1
+    , garbageTruckView model
         |> moveRight 1
-        |> moveDown 1
+        |> moveDown 200
+    , garbageCanView model.garbageCan.status model.garbageCan.x model.garbageCan.y
+    , rectangle red 2000 10
+        |> move 20 20
+    ]
+  else if model.level == 2 then
+    [ rectangle blue computer.screen.width computer.screen.height
+    --image 10 10 "images/Road.png"
+        --|> moveRight 1
+        --|> moveDown 1
     , garbageTruckView model
         |> moveRight 1
         |> moveDown 200
     , garbageCanView model.garbageCan.status model.garbageCan.x model.garbageCan.y
     , garbageCanView model.garbageCan2.status model.garbageCan2.x model.garbageCan2.y
+    , rectangle red 2000 10
+        |> move 20 125
+    , rectangle red 2000 10
+        |> move 20 -125
     ]
+  else
+    [image 1000 1000 "images/GameOver.jpg"
+      |> move 1 1]
+
 
 garbageCanView status x y =
     case status of
         FullOfGarbage ->
             image 110 110 "images/fullGarbage.jpg"
-                |> moveRight x
-                |> moveDown y
+              |> move x y
         Emptied ->
             image 110 100 ("images/emptyGarbage.jpg")
-                |> moveRight x
-                |> moveDown y
+              |> move x y
 
 
 garbageTruckView model =
@@ -96,11 +118,39 @@ garbageTruckView model =
 
 update : Computer -> Model -> Model
 update computer model =
+  if model.garbageCan.status == FullOfGarbage then
     let
         updatedX =
             model.x + toY computer.keyboard * 4 * cos (degrees model.angle)
         updatedY =
             model.y + toY computer.keyboard * 4 * sin (degrees model.angle)
+        updatedAngle =
+          if model.angle > -1 && model.angle < 180  then
+            model.angle - toX computer.keyboard
+          else if model.angle == -1 && computer.keyboard.left then
+            model.angle + 1
+          else if model.angle == 180 && computer.keyboard.right then
+            model.angle - 1
+          else
+            model.angle
+        updatedGarbageCan =
+            updateGarbageCan model
+        updatedGarbageCan2 =
+            updateGarbageCan2 model
+    in
+    { model
+        | x = updatedX
+        , y = updatedY
+        , angle = Debug.log "HI" updatedAngle
+        , garbageCan = updatedGarbageCan
+        , garbageCan2 = updatedGarbageCan2
+    }
+  else
+    let
+        updatedX =
+            model.x + toY computer.keyboard * cos (degrees model.angle)
+        updatedY =
+            model.y + toY computer.keyboard * sin (degrees model.angle)
         updatedAngle =
           if model.angle > -1 && model.angle < 180  then
             model.angle - toX computer.keyboard
